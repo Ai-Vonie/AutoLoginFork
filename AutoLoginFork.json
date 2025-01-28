@@ -2,7 +2,7 @@
   "Name": "Auto Login Fork",
   "Author": "Aida Enna",
   "InternalName": "AutoLoginFork",
-  "AssemblyVersion": "1.0.0.0",
+  "AssemblyVersion": "1.0.1.0",
   "ApplicableVersion": "any",
   "Punchline": "Automatically logs you into a specified character when the game first opens. Also includes auto-login after disconnects, lobby errors, and connection timeouts.",
   "Description": "Automatically logs you into a specified character when the game first opens. Also includes auto-login after disconnects, lobby errors, and connection timeouts. This is a fork of the original plugin AutoLogin by Aida Enna.",
