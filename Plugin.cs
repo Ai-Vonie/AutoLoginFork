@@ -80,7 +80,18 @@ namespace AutoLogin {
 
         public void AutoLogin()
         {
-            if (PluginConfig.DataCenter != 0 && PluginConfig.World != 0)
+            if (PluginConfig.SimpleLoginMode)
+            {
+                hasDoneLogin = true;
+                NotifObject.Content = "Auto logging in after connection error (Simple Mode) - Hold SPACE to cancel.";
+                NotifObject.Type = NotificationType.Info;
+                NotificationManager.AddNotification(NotifObject);
+                actionQueue.Enqueue(OpenStartMenu);
+                actionQueue.Enqueue(VariableDelay(10));
+                actionQueue.Enqueue(SelectCharacter);
+                actionQueue.Enqueue(SelectYes);
+            }
+            else if (PluginConfig.DataCenter != 0 && PluginConfig.World != 0)
             {
                 hasDoneLogin = true;
                 NotifObject.Content = "Auto logging in after connection error - Hold SPACE to cancel.";
@@ -97,7 +108,18 @@ namespace AutoLogin {
 
         private void OnLogin()
         {
-            if (PluginConfig.DataCenter != 0 && PluginConfig.World != 0)
+            if (PluginConfig.SimpleLoginMode)
+            {
+                hasDoneLogin = true;
+                NotifObject.Content = "Auto logging in (Simple Mode) - Hold SPACE to cancel.";
+                NotifObject.Type = NotificationType.Info;
+                NotificationManager.AddNotification(NotifObject);
+                actionQueue.Enqueue(OpenStartMenu);
+                actionQueue.Enqueue(VariableDelay(10));
+                actionQueue.Enqueue(SelectCharacter);
+                actionQueue.Enqueue(SelectYes);
+            }
+            else if (PluginConfig.DataCenter != 0 && PluginConfig.World != 0)
             {
                 hasDoneLogin = true;
                 NotifObject.Content = "Auto logging in - Hold SPACE to cancel.";
@@ -192,15 +214,15 @@ namespace AutoLogin {
         }
 
         private void OnFrameworkUpdate(IFramework framework) {
-			if (!hasDoneLogin && PluginConfig.DataCenter != 0 && PluginConfig.World != 0)
-			{
-				var addon = (AtkUnitBase*)GameGui.GetAddonByName("_TitleMenu");
-				if (addon == null || addon->IsVisible == false)
-					return;
+            if (!hasDoneLogin && ((PluginConfig.SimpleLoginMode) || (PluginConfig.DataCenter != 0 && PluginConfig.World != 0)))
+            {
+                var addon = (AtkUnitBase*)GameGui.GetAddonByName("_TitleMenu");
+                if (addon == null || addon->IsVisible == false)
+                    return;
 
-				OnLogin();
-			}
-			if (actionQueue.Count == 0) {
+                OnLogin();
+            }
+            if (actionQueue.Count == 0) {
                 if (sw.IsRunning) sw.Stop();
                 return;
             }
@@ -250,6 +272,14 @@ namespace AutoLogin {
 
         private void OpenConfigUI() {
             drawConfigWindow = !drawConfigWindow;
+        }
+
+        public bool OpenStartMenu() {
+            var addon = (AtkUnitBase*) GameGui.GetAddonByName("_TitleMenu");
+            if (addon == null || addon->IsVisible == false) return false;
+            PluginLog.Debug("Found Title Screen");
+            GenerateCallback(addon, 4);
+            return true;
         }
 
         public bool OpenDataCenterMenu() {

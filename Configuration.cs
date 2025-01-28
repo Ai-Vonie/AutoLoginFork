@@ -13,6 +13,7 @@ namespace AutoLogin {
         public int Version { get; set; }
         private bool ShowSupport;
         public bool AutoReconnectEnabled { get; set; } = true;
+        public bool SimpleLoginMode { get; set; } = false;
         
         public void Initialize(IDalamudPluginInterface pluginInterface)
         {
@@ -43,43 +44,58 @@ namespace AutoLogin {
 
             if (ImGui.Begin("AutoLogin Config", ref drawConfig, windowFlags)) {
 
-                if (ImGui.BeginCombo("Data Center", DataCenter == 0 ? "Not Selected" : currentDc.Name.ToString())) {
-                    foreach (var dc  in dcSheet.Where(w => w.Region > 0 && w.Name.ToString().Trim().Length > 0)) {
-                        if (ImGui.Selectable(dc.Name.ToString(), dc.RowId == DataCenter)) {
-                            DataCenter = dc.RowId;
-                            Save();
-                        }
-                    }
-                    ImGui.EndCombo();
+                var simpleMode = SimpleLoginMode;
+                if (ImGui.Checkbox("Simple Login Mode", ref simpleMode))
+                {
+                    SimpleLoginMode = simpleMode;
+                    Save();
+                }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip("When enabled, plugin will only select character slot without choosing datacenter/world");
                 }
 
-                if (currentDc.Region != 0) {
+                ImGui.Spacing();
 
-                    var currentWorld = worldSheet.GetRow(World);
-                    if (World != 0 && currentWorld.DataCenter.RowId != DataCenter) {
-                        World = 0;
-                        return true;
-                    }
-
-                    if (ImGui.BeginCombo("World", World == 0 ? "Not Selected" : currentWorld.Name.ToString())) {
-                        foreach (var w in worldSheet.Where(w => w.DataCenter.RowId == DataCenter && w.IsPublic)) {
-                            if (ImGui.Selectable(w.Name.ToString(), w.RowId == World)) {
-                                World = w.RowId;
+                if (!SimpleLoginMode) {
+                    if (ImGui.BeginCombo("Data Center", DataCenter == 0 ? "Not Selected" : currentDc.Name.ToString())) {
+                        foreach (var dc  in dcSheet.Where(w => w.Region > 0 && w.Name.ToString().Trim().Length > 0)) {
+                            if (ImGui.Selectable(dc.Name.ToString(), dc.RowId == DataCenter)) {
+                                DataCenter = dc.RowId;
                                 Save();
                             }
                         }
                         ImGui.EndCombo();
                     }
 
-                    if (currentWorld.IsPublic) {
-                        if (ImGui.BeginCombo("Character Slot", $"Slot #{CharacterSlot+1}")) {
-                            for (uint i = 0; i < 8; i++) {
-                                if (ImGui.Selectable($"Slot #{i+1}", CharacterSlot == i)) {
-                                    CharacterSlot = i;
+                    if (currentDc.Region != 0) {
+
+                        var currentWorld = worldSheet.GetRow(World);
+                        if (World != 0 && currentWorld.DataCenter.RowId != DataCenter) {
+                            World = 0;
+                            return true;
+                        }
+
+                        if (ImGui.BeginCombo("World", World == 0 ? "Not Selected" : currentWorld.Name.ToString())) {
+                            foreach (var w in worldSheet.Where(w => w.DataCenter.RowId == DataCenter && w.IsPublic)) {
+                                if (ImGui.Selectable(w.Name.ToString(), w.RowId == World)) {
+                                    World = w.RowId;
                                     Save();
                                 }
                             }
                             ImGui.EndCombo();
+                        }
+
+                        if (currentWorld.IsPublic) {
+                            if (ImGui.BeginCombo("Character Slot", $"Slot #{CharacterSlot+1}")) {
+                                for (uint i = 0; i < 8; i++) {
+                                    if (ImGui.Selectable($"Slot #{i+1}", CharacterSlot == i)) {
+                                        CharacterSlot = i;
+                                        Save();
+                                    }
+                                }
+                                ImGui.EndCombo();
+                            }
                         }
                     }
                 }
