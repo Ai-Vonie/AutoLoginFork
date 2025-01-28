@@ -16,13 +16,15 @@
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <NoWarn>CA1416;CS0169</NoWarn>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="..\Shared\Attributes.cs" Link="Shared\Attributes.cs" />
-      <Compile Include="..\Shared\Classes.cs" Link="Shared\Classes.cs" />
-      <Compile Include="..\Shared\Functions.cs" Link="Shared\Functions.cs" />
-      <Compile Include="..\Shared\PluginCommandManager.cs" Link="Shared\PluginCommandManager.cs" />
+      <Compile Include="Shared\Attributes.cs" />
+      <Compile Include="Shared\Classes.cs" />
+      <Compile Include="Shared\Functions.cs" />
+      <Compile Include="Shared\PluginCommandManager.cs" />
+      <Compile Include="**\*.cs" Exclude="Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup>
